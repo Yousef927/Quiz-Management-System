@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,8 +18,20 @@ public class QuestionService {
     @Autowired
     QuestionRepository questionRepository;
 
-    public ResponseEntity<List<Question>> getAllQuestions() {
-        return new ResponseEntity<>(questionRepository.findAll() , HttpStatus.OK);
+    public ResponseEntity<List<QuestionResponseDTO>> getAllQuestions() {
+        List<Question> questions = questionRepository.findAll();
+        List<QuestionResponseDTO>  responseList = new ArrayList<>();
+        for(Question question : questions) {
+            responseList.add(new QuestionResponseDTO(
+                    question.getId(),
+                    question.getQuestionTitle(),
+                    question.getOption1(),
+                    question.getOption2(),
+                    question.getOption3(),
+                    question.getOption4()
+            ));
+        }
+        return new ResponseEntity<>(responseList , HttpStatus.OK);
     }
 
     public ResponseEntity<String> addQuestion(QuestionRequestDTO questionRequest) {

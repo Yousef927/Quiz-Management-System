@@ -2,6 +2,7 @@ package com.hagag.QuizManagementSystem.controllers;
 
 import com.hagag.QuizManagementSystem.DAOS.QuestionRepository;
 import com.hagag.QuizManagementSystem.DTOS.QuestionRequestDTO;
+import com.hagag.QuizManagementSystem.DTOS.QuestionResponseDTO;
 import com.hagag.QuizManagementSystem.entities.Question;
 import com.hagag.QuizManagementSystem.services.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class QuestionController {
     QuestionService questionService;
 
     @GetMapping("/getQuestions")
-    public ResponseEntity<List<Question>> getQuestions() {
+    public ResponseEntity<List<QuestionResponseDTO>> getQuestions() {
         return questionService.getAllQuestions();
     }
 
