@@ -35,8 +35,15 @@ public class QuestionService {
     }
 
     public ResponseEntity<String> addQuestion(QuestionRequestDTO questionRequest) {
+        List<Question> actualQuestions = questionRepository.findAll();
         Question question = new Question();
-        question.setQuestionTitle(questionRequest.getQuestionTitle());
+        for (Question actualQuestion : actualQuestions) {
+            if (actualQuestion.getQuestionTitle().equals(questionRequest.getQuestionTitle())) {
+                return new ResponseEntity<>("Question already exists" , HttpStatus.BAD_REQUEST);
+            } else {
+                question.setQuestionTitle(questionRequest.getQuestionTitle());
+            }
+        }
         question.setOption1(questionRequest.getOption1());
         question.setOption2((questionRequest.getOption2()));
         question.setOption3(questionRequest.getOption3());
