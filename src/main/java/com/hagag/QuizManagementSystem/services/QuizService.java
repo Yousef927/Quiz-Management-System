@@ -2,6 +2,7 @@ package com.hagag.QuizManagementSystem.services;
 
 import com.hagag.QuizManagementSystem.DAOS.QuestionRepository;
 import com.hagag.QuizManagementSystem.DAOS.QuizRepository;
+import com.hagag.QuizManagementSystem.DTOS.QuestionResponseDTO;
 import com.hagag.QuizManagementSystem.entities.Question;
 import com.hagag.QuizManagementSystem.entities.Quiz;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,6 +43,27 @@ public class QuizService {
 
         quizRepository.save(quiz);
         return new ResponseEntity<>("Quiz created successfully" , HttpStatus.CREATED);
+
+
+
+
+    }
+
+    public ResponseEntity<List<QuestionResponseDTO>> getQuizQuestions(Integer id) {
+        Quiz quiz = quizRepository.findById(id).get();
+        List<Question> quizQuestions = quiz.getQuestions();
+        List<QuestionResponseDTO> questionResponseDTOS = new ArrayList<>();
+
+        for(Question question : quizQuestions) {
+            questionResponseDTOS.add(new QuestionResponseDTO(
+                    question.getId(),
+                    question.getQuestionTitle(),
+                    question.getOption1(),
+                    question.getOption2(),
+                    question.getOption3(),
+                    question.getOption4()));
+        }
+        return new ResponseEntity<>(questionResponseDTOS , HttpStatus.OK);
 
 
 
