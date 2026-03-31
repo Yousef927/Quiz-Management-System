@@ -1,6 +1,8 @@
 package com.hagag.QuizManagementSystem.controllers;
 
 import com.hagag.QuizManagementSystem.DTOS.QuestionResponseDTO;
+import com.hagag.QuizManagementSystem.DTOS.QuizResultDTO;
+import com.hagag.QuizManagementSystem.entities.Response;
 import com.hagag.QuizManagementSystem.services.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +25,10 @@ public class QuizController {
     @GetMapping("/getQuizQuestions/{id}")
     public ResponseEntity<List<QuestionResponseDTO>> getQuizQuestions(@PathVariable Integer id) {
         return quizService.getQuizQuestions(id);
+    }
+
+    @PostMapping("/submitQuiz/{id}")
+    public ResponseEntity<QuizResultDTO> submitQuiz(@PathVariable Integer id , @RequestBody List<Response> responses) {
+        return quizService.submitQuiz(id , responses);
     }
 }
