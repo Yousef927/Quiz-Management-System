@@ -3,14 +3,15 @@ package com.hagag.QuizManagementSystem.services;
 import com.hagag.QuizManagementSystem.DAOS.QuestionRepository;
 import com.hagag.QuizManagementSystem.DAOS.QuizRepository;
 import com.hagag.QuizManagementSystem.DTOS.QuestionResponseDTO;
+import com.hagag.QuizManagementSystem.DTOS.QuizResultDTO;
 import com.hagag.QuizManagementSystem.entities.Question;
 import com.hagag.QuizManagementSystem.entities.Quiz;
+import com.hagag.QuizManagementSystem.entities.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,12 +45,12 @@ public class QuizService {
         quizRepository.save(quiz);
         return new ResponseEntity<>("Quiz created successfully" , HttpStatus.CREATED);
 
-
-
-
     }
 
     public ResponseEntity<List<QuestionResponseDTO>> getQuizQuestions(Integer id) {
+        if (!quizRepository.existsById(id)) {
+            return null;
+        }
         Quiz quiz = quizRepository.findById(id).get();
         List<Question> quizQuestions = quiz.getQuestions();
         List<QuestionResponseDTO> questionResponseDTOS = new ArrayList<>();
@@ -65,8 +66,31 @@ public class QuizService {
         }
         return new ResponseEntity<>(questionResponseDTOS , HttpStatus.OK);
 
+    }
 
+    public ResponseEntity<QuizResultDTO> submitQuiz(Integer id, List<Response> responses) {
 
+        if (!quizRepository.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Quiz quiz = quizRepository.findById(id).get();
+        List<Question> quizQuestions = quiz.getQuestions();
+        QuizResultDTO quizResultDTO = new QuizResultDTO();
 
+        int score = 0;
+        for(Response response : responses) {
+            for(Question question : quizQuestions) {
+                if (question.getId().equals(response.getQuestionId())) {
+
+                    if (question.getRightAnswer().trim().equalsIgnoreCase(response.getAnswer().trim())) {
+                        score++;
+                    }
+                    break;
+                }
+            }
+        }
+        quizResultDTO.setStudentScore(score);
+        quizResultDTO.setQuizTotalScore(quizQuestions.size());
+        return new ResponseEntity<>(  quizResultDTO , HttpStatus.OK);
     }
 }
