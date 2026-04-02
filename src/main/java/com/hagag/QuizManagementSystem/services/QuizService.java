@@ -7,6 +7,8 @@ import com.hagag.QuizManagementSystem.DTOS.QuizResultDTO;
 import com.hagag.QuizManagementSystem.entities.Question;
 import com.hagag.QuizManagementSystem.entities.Quiz;
 import com.hagag.QuizManagementSystem.entities.Response;
+import com.hagag.QuizManagementSystem.exception.QuizNotFoundException;
+import com.hagag.QuizManagementSystem.exception.QuizSubmissionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/quiz")
@@ -47,11 +50,16 @@ public class QuizService {
 
     }
 
-    public ResponseEntity<List<QuestionResponseDTO>> getQuizQuestions(Integer id) {
-        if (!quizRepository.existsById(id)) {
-            return null;
+    public ResponseEntity<List<QuestionResponseDTO>> getQuizQuestions(Integer id)  {
+
+        Optional<Quiz> quizOptional = quizRepository.findById(id);
+
+        if ((quizOptional.isEmpty())) {
+            throw new QuizNotFoundException("Quiz with id " + id + " not found");
         }
-        Quiz quiz = quizRepository.findById(id).get();
+
+        Quiz quiz = quizOptional.get();
+
         List<Question> quizQuestions = quiz.getQuestions();
         List<QuestionResponseDTO> questionResponseDTOS = new ArrayList<>();
 
@@ -69,11 +77,14 @@ public class QuizService {
     }
 
     public ResponseEntity<QuizResultDTO> submitQuiz(Integer id, List<Response> responses) {
-
-        if (!quizRepository.existsById(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Optional<Quiz> quizOptional = quizRepository.findById(id);
+        if (quizOptional.isEmpty()) {
+            throw new QuizNotFoundException("Quiz with id " + id + " not found");
         }
-        Quiz quiz = quizRepository.findById(id).get();
+        if (responses == null || responses.isEmpty()) {
+            throw new QuizSubmissionException("Quiz responses cannot be empty or null");
+        }
+        Quiz quiz = quizOptional.get();
         List<Question> quizQuestions = quiz.getQuestions();
         QuizResultDTO quizResultDTO = new QuizResultDTO();
 
