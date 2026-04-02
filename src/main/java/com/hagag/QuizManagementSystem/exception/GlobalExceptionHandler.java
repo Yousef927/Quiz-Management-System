@@ -12,4 +12,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleQuizNotFound(QuizNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(QuestionNotFoundException.class)
+    public ResponseEntity<String> handleQuestionNotFound(QuestionNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage() , HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(QuizSubmissionException.class)
+    public ResponseEntity<String> handleQuizSubmission(QuizSubmissionException ex) {
+        return new ResponseEntity<>(ex.getMessage() , HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(QuestionAlreadyExistException.class)
+    public ResponseEntity handleQuestionAlreadyExist(QuestionAlreadyExistException ex) {
+        return new ResponseEntity<>(ex.getMessage() , HttpStatus.BAD_REQUEST);
+    }
 }
