@@ -4,6 +4,8 @@ import com.hagag.QuizManagementSystem.DAOS.QuestionRepository;
 import com.hagag.QuizManagementSystem.DTOS.QuestionRequestDTO;
 import com.hagag.QuizManagementSystem.DTOS.QuestionResponseDTO;
 import com.hagag.QuizManagementSystem.entities.Question;
+import com.hagag.QuizManagementSystem.exception.QuestionAlreadyExistException;
+import com.hagag.QuizManagementSystem.exception.QuestionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuestionService {
@@ -36,14 +39,14 @@ public class QuestionService {
 
     public ResponseEntity<String> addQuestion(QuestionRequestDTO questionRequest) {
         List<Question> actualQuestions = questionRepository.findAll();
-        Question question = new Question();
         for (Question actualQuestion : actualQuestions) {
             if (actualQuestion.getQuestionTitle().equals(questionRequest.getQuestionTitle())) {
-                return new ResponseEntity<>("Question already exists" , HttpStatus.BAD_REQUEST);
-            } else {
-                question.setQuestionTitle(questionRequest.getQuestionTitle());
+                throw new QuestionAlreadyExistException("Question with title \"" + questionRequest.getQuestionTitle()
+                        + "\" already exists");
             }
         }
+        Question question = new Question();
+        question.setQuestionTitle(questionRequest.getQuestionTitle());
         question.setOption1(questionRequest.getOption1());
         question.setOption2((questionRequest.getOption2()));
         question.setOption3(questionRequest.getOption3());
@@ -58,6 +61,7 @@ public class QuestionService {
     }
 
     public ResponseEntity<String> deleteQuestion(Integer id) {
+
         if(!questionRepository.existsById(id)) {
             return new ResponseEntity<>("Question not found" , HttpStatus.NOT_FOUND);
         }
@@ -67,10 +71,12 @@ public class QuestionService {
     }
 
     public ResponseEntity<String> updateQuestion(Integer id, QuestionRequestDTO questionRequest) {
-        if(!questionRepository.existsById(id)) {
-            return new ResponseEntity<>("Question not found" , HttpStatus.NOT_FOUND);
+        Optional<Question> questionOptional = questionRepository.findById(id);
+
+        if(questionOptional.isEmpty()) {
+            throw new QuestionNotFoundException("Question with id " + id + " not found");
         }
-        Question question = questionRepository.findById(id).get();
+        Question question = questionOptional.get();
         question.setQuestionTitle(questionRequest.getQuestionTitle());
         question.setOption1(questionRequest.getOption1());
         question.setOption2((questionRequest.getOption2()));
