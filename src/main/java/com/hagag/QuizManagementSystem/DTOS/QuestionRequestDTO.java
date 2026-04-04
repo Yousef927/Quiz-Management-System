@@ -1,11 +1,14 @@
 package com.hagag.QuizManagementSystem.DTOS;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
 public class QuestionRequestDTO {
+
+    @NotBlank
     private String questionTitle;
     private String option1;
     private String option2;
